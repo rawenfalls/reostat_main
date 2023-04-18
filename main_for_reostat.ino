@@ -23,12 +23,12 @@ SoftwareSerial mySerial(2, 3);
 NDIRZ16 mySensor = NDIRZ16(&mySerial);
 
 
-const byte size_arr_integr = 20; // размер массива
+const byte size_arr_integr = 10; // размер массива
 byte counter=0;
-int arr_integr[size_arr_integr] = {0}; // создание массива и инициализация нулями
-int arr_integr1[size_arr_integr] = {0};
+double arr_integr[size_arr_integr] = {0}; // создание массива и инициализация нулями
+double arr_integr1[size_arr_integr] = {0};
 double input, output, setpoint = 35;
-double Kp = 0.075, Ki = 0.004, Kd = 12;//уменьшить коэффициент kp -0.015, kd -4
+double Kp = 0.060, Ki = 0.0035, Kd = 0;//уменьшить коэффициент kp -0.015, kd -4
 double integral, derivative, error, previous_error;
 double sum_arr_integr =0 ;
 
@@ -100,16 +100,20 @@ void loop() {
     memset(arr_integr,0,sizeof(arr_integr));
     memset_trig = 0;
     counter = 0; 
+    sum_arr_integr = 0;
     }
   }
   else
   {
     memset_trig = 1;
-          if(counter < size_arr_integr)
-          arr_integr[counter] = temperature1; 
-        else {counter = 0;arr_integr[counter] = temperature1;}
-        for (int counter1 = 0; counter1<size_arr_integr; counter1++)
+          if(counter < size_arr_integr){
+          arr_integr[counter] = setpoint - temperature1; counter++;}
+        else {counter = 0;arr_integr[counter] = setpoint - temperature1;}
+        for (int counter1 = 0; counter1<size_arr_integr; counter1++){
           sum_arr_integr +=arr_integr[counter1];
+          Serial.print(arr_integr[counter1]);
+          Serial.print(' ');
+        }
 	integral = sum_arr_integr;
   sum_arr_integr = 0;
 	derivative = error - previous_error;
