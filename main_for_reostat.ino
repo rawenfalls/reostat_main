@@ -23,12 +23,12 @@ SoftwareSerial mySerial(2, 3);
 NDIRZ16 mySensor = NDIRZ16(&mySerial);
 
 
-const byte size_arr_integr = 10; // размер массива
+const byte size_arr_integr = 20; // размер массива
 byte counter=0;
 double arr_integr[size_arr_integr] = {0}; // создание массива и инициализация нулями
 double arr_integr1[size_arr_integr] = {0};
 double input, output, setpoint = 35;
-double Kp = 0.060, Ki = 0.0035, Kd = 0;//уменьшить коэффициент kp -0.015, kd -4
+double Kp = 0.06, Ki = 0.03, Kd = 0;//уменьшить коэффициент kp -0.015, kd -4
 double integral, derivative, error, previous_error;
 double sum_arr_integr =0 ;
 
@@ -83,7 +83,7 @@ void loop() {
 	// вычисление ошибки и обновление интеграла и производной
 	error = setpoint - temperature1;
   
-  if(error>=0.06*setpoint){
+  if(error>=0.03*setpoint){
   output = Kp * error;
   integral = 0;
   derivative = 0;
@@ -109,13 +109,17 @@ void loop() {
           if(counter < size_arr_integr){
           arr_integr[counter] = setpoint - temperature1; counter++;}
         else {counter = 0;arr_integr[counter] = setpoint - temperature1;}
+        sum_arr_integr = 0;
         for (int counter1 = 0; counter1<size_arr_integr; counter1++){
           sum_arr_integr +=arr_integr[counter1];
           Serial.print(arr_integr[counter1]);
           Serial.print(' ');
         }
+        Serial.print("sum_arr_integr: ");
+        Serial.print(sum_arr_integr);
+        Serial.print(' ');
 	integral = sum_arr_integr;
-  sum_arr_integr = 0;
+  
 	derivative = error - previous_error;
 	previous_error = error;
   // вычисление выходного значения по ПИД-алгоритму
